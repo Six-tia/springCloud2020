@@ -6,7 +6,13 @@ import com.tiaedu.springcloud.service.PaymentService;
 import com.tiaedu.springcloud.service.impl.PaymentServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @ResponseBody 添加到返回值中的每个@RequestMapping方法，Spring将<context:component-scan>
@@ -30,6 +36,14 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
+
+    //application.yml的内容
+    @Value("${server.port}")
+    private String serverPort;
+
+    @Resource
+    private DiscoveryClient discoveryClient;
+
     /** @PathVariable
      * 作用：
      *  处理request url部分（这里指url template中variable，不含queryString部分）的注解
@@ -72,7 +86,7 @@ public class PaymentController {
         int result = paymentService.create(payment);
         log.info("***insert result:" + result);
         if(result > 0){
-            return new CommonResult(200, "insert successful!", result);
+            return new CommonResult(200, "insert successful!" + serverPort, result);
         }else{
             return new CommonResult(400, "insert fail!", null);
         }
@@ -82,9 +96,23 @@ public class PaymentController {
         Payment payment = paymentService.getPaymentById(id);
         log.info("***select result:" + payment);
         if(payment != null){
-            return new CommonResult(200, "select successful!", payment);
+            return new CommonResult(200, "select successful!" + serverPort, payment);
         }else{
             return new CommonResult(400, "select fail!", null);
         }
+    }
+
+    @GetMapping(value="/payment/discovery")
+    public Object discovery(){
+        List<String> services = discoveryClient.getServices();
+        for(String service : services){
+            log.info("********service:" + service);
+        }
+
+        List<ServiceInstance> instances = discoveryClient.getInstances("CLOUD-PAYMENT-SERVICE");
+        for (ServiceInstance instance : instances) {
+            log.info(instance.getServiceId() + "\t" + instance.getHost() + "\t" + instance.getPort() + "\t" + instance.getUri());
+        }
+        return this.discoveryClient;
     }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.tiaedu.springcloud.dao.PaymentDao">
+    <!-- useGeneratedKeys:对于支持自动生成记录主键的数据库，如：MySQL，SQL Server，
+       设置useGeneratedKeys="true"，在执行添加之后可以获取到数据库自动生成的主键ID。-->
+    <insert id="create" parameterType="Payment" useGeneratedKeys="true" keyProperty="id">
+        insert into payment(serial)
+            values("${serial}")
+    </insert>
+
+    <!-- column:sql property:javabean -->
+    <resultMap id="BaseResultMap" type="com.tiaedu.springcloud.entities.Payment">
+        <id column = "id" property = "id" jdbcType="BIGINT"/>
+        <id column = "serial" property = "serial" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- 比起resultType，复杂环境resultMap更加适用（使用了映射）
+    resultType可以把查询结果封装到pojo(plain ordinary java object, 即普通的javabean)类型中，
+    但必须pojo类的属性名和查询到的数据库表的字段名一致。
+    如果sql查询到的字段与pojo的属性名不一致，则需要使用resultMap将字段名和属性名对应起来，
+    进行手动配置封装，将结果映射到pojo中-->
+    <select id = "getPaymentById" parameterType="Long" resultMap="BaseResultMap">
+        select * from payment where id = ${id}
+    </select>
+</mapper>
