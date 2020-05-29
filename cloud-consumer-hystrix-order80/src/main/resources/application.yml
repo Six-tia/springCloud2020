@@ -1,0 +1,28 @@
+server:
+  port: 80
+
+spring:
+  application:
+    name: cloud-order-service #微服务名称
+
+eureka:
+  client:
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/, http://eureka7002.com:7002/eureka/
+
+ribbon:
+  #指建立连接等待时间，适用于网络连接正常情况下两端连接所用时间
+  ReadTimeout: 5000
+  #指建立连接后从服务器读取到可用资源的时间
+  ConnectTimeout: 5000
+
+logging:
+  level:
+    #feign日志以什么级别监控哪个接口
+    com.tiaedu.springcloud.service.PaymentHystrixService: debug
+
+#此微服务作为消费方，OpenFeign需要在yml中开启Hystrix熔断机制才能使用
+feign:
+  hystrix:
+    enabled: true

@@ -13,3 +13,6 @@ eureka:
       #注意这不并是过滤应用的上下文路径，而是过滤剩下的请求路径
       #即以下实际路径为http://eureka7001.com:7001
       defaultZone: http://eureka7001.com:7001/eureka/
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 2000
